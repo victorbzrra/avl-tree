@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define True 1
 #define False 0
@@ -176,25 +177,28 @@ Node * delete_node(Node * root, int key) {
 }
 
 int main() {
-    Node * root = NULL;
+    srand(time(NULL));
 
-    root = insert(root, 10);
-    root = insert(root, 20);
-    root = insert(root, 30);
-    root = insert(root, 40);
-    root = insert(root, 50);
-    root = insert(root, 25);
+    for (int i = 1; i < 101; i++) {
+        printf("AVL %d\n", i);
+        int keys[100];
+        for (int l = 0; l < 100; l++) keys[l] = 0;
+        
+        Node * root = NULL;
+        for (int j = 0; j < 1000; j++) {
+            int value = rand() % 100000;
+            root = insert(root, value);
+            if (j < 100) keys[j] = value;
+        }
+        printf("TAMANHO DA AVL: %d\n", count(root));
+        size_of_tree = 0;
 
-    int verifyAVL = verify(root);
-    printf("É AVL? %s\n", (verifyAVL == 1) ? "SIM" : "NÃO");
-    printf("TAMANHO DA AVL: %d\n", count(root));
-
-    size_of_tree = 0;
-    delete_node(root, 30);
-
-    verifyAVL = verify(root);
-    printf("É AVL? %s\n", (verifyAVL == 1) ? "SIM" : "NÃO");
-    printf("TAMANHO DA AVL: %d\n", count(root));
+        for (int k = 0; k < 100; k++) {
+            delete_node(root, keys[k]);
+        }
+        printf("TAMANHO DA AVL: %d\n", count(root));
+        size_of_tree = 0;
+    }
 
     return 0;
 }
