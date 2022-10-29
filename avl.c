@@ -12,7 +12,7 @@ typedef struct node {
 	struct node * right;
 }Node;
 
-// variável global
+/* variável global */
 int size_of_tree = 0;
 
 /* Retorna o maior valor entre os elementos */
@@ -109,6 +109,7 @@ Node * insert(Node * node, int key) {
 	return node;
 }
 
+/* Verifica se a árvore é uma AVL*/
 int verify(Node * root) {
 	if (root != NULL && (root -> height <= 1 || root -> height >= -1)) {
 		verify(root -> left);
@@ -117,6 +118,7 @@ int verify(Node * root) {
     return True;
 }
 
+/* Conta o número de nós da árvore */
 int count(Node * root) {
     if (root != NULL) {
         size_of_tree += 1;
@@ -127,6 +129,7 @@ int count(Node * root) {
     return size_of_tree;
 }
 
+/* Retorna o menor valor da AVL*/
 Node * min_node(Node * node) {
     Node * target = node;
     while (target -> left != NULL) target = target -> left;
@@ -134,39 +137,63 @@ Node * min_node(Node * node) {
     return target;
 }
 
+/* Remove nós da AVL*/
 Node * delete_node(Node * root, int key) {
+
+    /* Caso base para remoção */
     if (root == NULL) return root;
+
+    /* Caso a chave a ser deletada for menor que a chave da raiz */
     if (key < root -> key) root -> left = delete_node(root -> left, key);
+
+    /* Caso a chave a ser deletada for maior que a chave da raiz */
     else if (key > root -> key) root -> right = delete_node(root -> right, key);
+    
+    /* Caso a chave a ser deletada seja igual a chave da raiz */
     else {
         Node * aux = NULL;
         if ((root -> left == NULL || root -> right == NULL)) {
             aux = root -> left ? root -> left : root -> right;
+            /* Caso o node não tenha filhos */
             if (aux == NULL) {
                 aux = root;
                 root = NULL;
             } 
+            /* Caso o node tenha apenas um filho */
             else * root = * aux;
             free(aux);
         }
         else {
+            /* Caso em que o node tenha dois filhos */
             aux = min_node(root -> right);
             root -> key = aux -> key;
             root -> right = delete_node(root -> right, aux -> key);
         }
     }
 
+    /* Caso a árvore tenha apenas um node */
     if (root == NULL) {
         return root;
+
+        /* Atualiza a altura do node atual */
         root -> height = 1 + max(height(root -> left), height(root -> right));
+        
+        /* Obeter o fator de balanceamento */
         int balance = get_balance(root);
 
+        /* Caso Left Left (LL) */
         if (balance > 1 && get_balance(root -> left) >= 0) return right_rotate(root);
+        
+        /* Caso Left Right (RL) */
         if (balance > 1 && get_balance(root -> left) < 0) {
             root -> left = left_rotate(root -> left);
             return right_rotate(root);
         }
+
+        /* Caso Right Right (RR) */
         if (balance < -1 && get_balance(root -> right) <= 0) return left_rotate(root);
+        
+        /* Caso Right Left (RL) */
         if (balance < -1 && get_balance(root -> right) > 0) {
             root -> right = right_rotate(root -> right);
             return left_rotate(root);
